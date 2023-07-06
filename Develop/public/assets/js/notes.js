@@ -96,11 +96,20 @@ const handleNoteDelete = (e) => {
 };
 
 // Sets the activeNote and displays it
-const handleNoteView = (e) => {
+const handleNoteView = function (e) {
   e.preventDefault();
-  activeNote = JSON.parse(e.target.parentElement.getAttribute('data-note'));
-  renderActiveNote();
+  const clickedNote = e.target.closest('.list-group-item');
+  if (clickedNote) {
+    const clickedNoteData = JSON.parse(clickedNote.getAttribute('data-note'));
+    const savedNotes = Array.from(noteList[0].children).map((note) => JSON.parse(note.dataset.note));
+    activeNote = savedNotes.find((note) => note.id === clickedNoteData.id) || {};
+    renderActiveNote();
+    noteTitle.value = activeNote.title; // Load the title of the activeNote into the input field
+    noteText.value = activeNote.text; // Load the text of the activeNote into the textarea
+    noteTitle.focus(); // Set focus to noteTitle input field
+  }
 };
+
 
 // Sets the activeNote to and empty object and allows the user to enter a new note
 const handleNewNoteView = (e) => {
@@ -124,6 +133,10 @@ const renderNoteList = async (notes) => {
   }
 
   let noteListItems = [];
+
+
+
+
 
   // Returns HTML element with or without a delete button
   const createLi = (text, delBtn = true) => {
@@ -178,6 +191,9 @@ if (window.location.pathname === '/notes') {
   newNoteBtn.addEventListener('click', handleNewNoteView);
   noteTitle.addEventListener('keyup', handleRenderSaveBtn);
   noteText.addEventListener('keyup', handleRenderSaveBtn);
-}
+    // Attach click event listener to noteList container
+    const noteListContainer = document.querySelector('.list-container');
+    noteListContainer.addEventListener('click', handleNoteView);
+  }
 
 getAndRenderNotes();
